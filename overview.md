@@ -82,31 +82,6 @@ back to their Collection, so clients can easily find fields like the license. Th
 shares the fields described in their parent Collection. Collection entities can be used just like Catalog 
 entities to provide structure, as they provide all the same options for linking and organizing.
 
-But what *should* go in a Collection, versus just in a Catalog?  A Collection will generally consist of
-a set of assets that are defined with the same properties and share higher level metadata. In the 
-satellite world these would typically all come from the same sensor or constellation. It corresponds
-directly to what others call a "dataset series" (ESA, ISO 19115), "collection" (CNES, NASA), and 
-"dataset" (JAXA, DCAT). So if all your Items have the same properties, they probably belong in 
-the same Collection. But the construct is deliberately flexible, as there may be good reasons
-to break the recommendation.
-
-Catalogs in turn are used for two main things:
-
-- Split overly large collections into groups
-- Group collections into a catalog of Collections (e.g. as entry point for navigation to several Collections).
-
-The first case allows users to browse down into the Items of large collections. A collection like
-Landsat usually would start with path and row Catalogs to group by geography, and then year, 
-month and day groups to enable deeper grouping. [Dynamic catalogs](best-practices.md#dynamic-catalogs) can
-provide multiple grouping paths, serving as a sort of faceted search.
-
-The second case is used when one wants to represent diverse data in a single place. If an organization
-has an internal catalog with Landsat 8, Sentinel 2, NAIP data and several commercial imagery providers
-then they'd have a root Catalog that would link to a number of different Collections. 
-
-So in conclusion it's best to use Collections for what you want user to find as starting point, and then
-Catalogs are just for structuring and grouping the data. Future work includes a mechanism to actually
-search Collection-level data, hopefully in concert with other specifications.
 
 ## Catalog Overview
 
@@ -118,37 +93,6 @@ points to [STAC Items](item-spec/README.md), or to other STAC catalogs. It provi
 linking structure that can be used recursively so that many Items can be included in 
 a single Catalog, organized however the implementor desires. 
 
-STAC makes no formal distinction between a "root" Catalog and the "child" Catalogs. A root Catalog
-is simply the top-most Catalog or Collection -- it has no parent. A nested catalog structure is useful (and
-recommended) for breaking up massive numbers of catalog Items into logical groupings. For example,
-it might make sense to organize a catalog by date (year, month, day), or geography (continent,
-country, state/prov). See the [Catalog Layout](best-practices.md#catalog-layout) best practices
-section for more.
-
-A simple STAC structure might look like this:
-
-- catalog (root)
-  - catalog
-    - catalog
-      - item
-        - asset
-      - item
-        - asset
-    - item
-      - asset
-      - asset
-
-This example might be considered a somewhat "typical" structure. However, Catalogs and Items can
-describe a number of different relationships. The following shows various relationships between
-catalogs and items:
-
-- `Catalog` -> `Item` (this is a common structure for a catalog to list links to Items)
-- `Catalog` -> `Catalog` (this is a common tree structure to group sets of Items. Each catalog in
-  this relationship may also include Item links as well as catalog links)
-
-The relationships are all described by a common `links` object structure, making use of
-the `rel` field to further describe the relationship. 
-
 There are a few types of catalogs that implementors occasionally refer to. These get defined by the `links` structure.
 
 - A **sub-catalog** is a Catalog that is linked to from another Catalog that is used to better organize data. For example a Landsat collection
@@ -158,6 +102,8 @@ There are a few types of catalogs that implementors occasionally refer to. These
   contain sub-catalogs that provide a variety of Collections.
 - A **parent catalog** is the Catalog that sits directly above a sub-catalog. Following parent catalog links continuously
   will naturally end up at a root catalog definition.
+
+See [Best Practices](best-practices.md#example-layouts) for example structures.
  
 It should be noted that a Catalog does not have to link back to all the other Catalogs that point to it. Thus a published 
 root catalog might be a sub-catalog of someone else's structure. The goal is for data providers to publish all the 
@@ -172,22 +118,6 @@ or it can be generated on the fly by a live server. The first type of implementa
 and any catalog that is not just files is called a 'dynamic catalog'. You can read more about the two types along with
 recommendations in [this section](best-practices.md#static-and-dynamic-catalogs) of the best practices document, 
 along with how to keep a [dynamic catalog in sync](best-practices.md#static-to-dynamic-best-practices) with a static one.
-
-### Catalog Best Practices
-
-In addition to information about different catalog types, the [best practices document](best-practices.md) has
-a number of suggestions on how to organize and implement good catalogs. The [catalog specification](catalog-spec/catalog-spec.md)
-is designed for maximum flexbility, so none of these are required, but they provide guidance for implementors who
-want to follow what most of the STAC community is doing.
-
-- [Catalog Layout](best-practices.md#catalog-layout) is likely the most important section, as following its 
-recommendations will enable catalogs to work better with client tooling that optimizes for known layouts.
-- [Use of Links](best-practices.md#use-of-links) articulates practices for making catalogs that are portable (with
-relative links through out) and ones that are published in stable locations (with absolute self links).
-- [Versioning for Catalogs](best-practices.md#versioning-for-catalogs) explains how to use STAC's structure to
-keep a history of changes made to Items and catalogs.
-- [STAC on the Web](best-practices.md#stac-on-the-web) explains how catalogs should have html versions for 
-each Item and Catalog, as well as ways to achieve that.
 
 ## Collection Overview
 

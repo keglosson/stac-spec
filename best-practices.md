@@ -27,12 +27,14 @@
       - [Thumbnail](#thumbnail)
       - [Overview](#overview)
       - [Visual](#visual)
-- **[Catalog & Collection Best Practices](#catalog--collection-practices)**
+- **[Catalog & Collection Best Practices](#catalog--collection-practices)**  
+  - [When to use Catalog vs Collection?](#when-to-use-collection-vs-catalog)
   - [Static and Dynamic Catalogs](#static-and-dynamic-catalogs)
     - [Static Catalogs](#static-catalogs)
     - [Dynamic Catalogs](#dynamic-catalogs)
   - [Catalog Layout](#catalog-layout)
     - [Dynamic Catalog Layout](#dynamic-catalog-layout)
+    - [Example Layouts](#example-layouts)
     - [Mixing STAC Versions](#mixing-stac-versions)
   - [Using Summaries in Collections](#using-summaries-in-collections)
   - [Use of links](#use-of-links)
@@ -248,6 +250,8 @@ that is not possible then the appropriate way to handle Collection-level search 
 [OGC API - Records](https://github.com/opengeospatial/ogcapi-records) standard, which is a 'brother' specification of STAC API. 
 Both are compliant with OGC API - Features, adding richer search capabilities to enable finding of data. 
 
+As a general rule of thumb, it's recommended to use [OGC API - Features](https://github.com/opengeospatial/ogcapi-features) if geometry **is the data**, use STAC if geometry **describes** the data.
+
 ## Asset Practices
 
 ### Common Use Cases of Additional Fields for Assets
@@ -404,6 +408,35 @@ file that just has the bands needed for display
 [Catalog spec](catalog-spec/catalog-spec.md), and 'catalog' (with a lowercase c) to refer to any full STAC implementation, 
 which can be any mix of Catalogs Collections and Items.*
 
+### When to use Collection vs Catalog?
+
+What *should* go in a Collection, versus just in a Catalog?  A Collection will generally consist of
+a set of assets that are defined with the same properties and share higher level metadata. In the 
+satellite world these would typically all come from the same sensor or constellation. It corresponds
+directly to what others call a "dataset series" (ESA, ISO 19115), "collection" (CNES, NASA), and 
+"dataset" (JAXA, DCAT). So if all your Items have the same properties, they probably belong in 
+the same Collection. But the construct is deliberately flexible, as there may be good reasons
+to break the recommendation.
+
+Catalogs in turn are used for two main things:
+
+- Split overly large collections into groups
+- Group collections into a catalog of Collections (e.g. as entry point for navigation to several Collections).
+
+The first case allows users to browse down into the Items of large collections. A collection like
+Landsat usually would start with path and row Catalogs to group by geography, and then year, 
+month and day groups to enable deeper grouping. [Dynamic catalogs](#dynamic-catalogs) can
+provide multiple grouping paths, serving as a sort of faceted search.
+
+The second case is used when one wants to represent diverse data in a single place. If an organization
+has an internal catalog with Landsat 8, Sentinel 2, NAIP data and several commercial imagery providers
+then they'd have a root Catalog that would link to a number of different Collections. 
+
+So in conclusion it's best to use Collections for what you want the user to find as a starting point, and then
+Catalogs are just for structuring and grouping the data. Future work includes a mechanism to actually
+search Collection-level data, hopefully in concert with other specifications.
+
+
 ### Static and Dynamic Catalogs
 
 As mentioned in the main [overview](overview.md), there are two main types of catalogs - static
@@ -501,6 +534,38 @@ by providers, and users could browse down to both. The leaf Items should just be
 provide multiple 'views' to allow users to navigate in a way that makes sense to them, providing multiple 'sub-catalogs'
 from the root that enable different paths to browse (country/state, date/time, constellation/satellite, etc). But the 
 canonical 'rel' link should be used to designate the primary location of the Item to search engine crawlers.
+
+#### Example Layouts
+
+STAC makes no formal distinction between a "root" Catalog and the "child" Catalogs. A root Catalog
+is simply the top-most Catalog or Collection -- it has no parent. A nested catalog structure is useful (and
+recommended) for breaking up massive numbers of catalog Items into logical groupings. For example,
+it might make sense to organize a catalog by date (year, month, day), or geography (continent,
+country, state/prov).
+
+A simple STAC structure might look like this:
+
+- catalog (root)
+  - catalog
+    - catalog
+      - item
+        - asset
+      - item
+        - asset
+    - item
+      - asset
+      - asset
+
+This example might be considered a somewhat "typical" structure. However, Catalogs and Items can
+describe a number of different relationships. The following shows various relationships between
+catalogs and items:
+
+- `Catalog` -> `Item` (this is a common structure for a catalog to list links to Items)
+- `Catalog` -> `Catalog` (this is a common tree structure to group sets of Items. Each catalog in
+  this relationship may also include Item links as well as catalog links)
+
+The relationships are all described by a common `links` object structure, making use of
+the `rel` field to further describe the relationship. 
 
 #### Mixing STAC Versions
 
