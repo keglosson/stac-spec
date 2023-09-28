@@ -402,7 +402,7 @@ be possible to open up on non-specialist software and display just fine. It can 
 by providing the key display bands combined, or can complement assets where many non-visible bands are included, by being a lighter weight
 file that just has the bands needed for display
 
-## Catalog & Collection Practices
+## Catalog & Collection Best Practices
 
 *Note: This section uses the term 'Catalog' (with an uppercase C) to refer to the JSON entity specified in the 
 [Catalog spec](catalog-spec/catalog-spec.md), and 'catalog' (with a lowercase c) to refer to any full STAC implementation, 
@@ -521,29 +521,13 @@ One further recommendation to help tools is to always include the 'title' field 
 link destination. Having this enables clients to display a nice human readable name of the link without having  to open the 
 link destination. 
 
-#### Dynamic Catalog Layout
-
-While these recommendations were primarily written for [static catalogs](#static-catalogs), they apply
-equally well to [dynamic catalogs](#dynamic-catalogs). Subdirectories of course would just be URL paths 
-generated dynamically, but the structure would be the same as is recommended.
-
-One benefit of a dynamic catalog is that it can generate various 'views' of the catalog, exposing the same Items in 
-different sub-catalog organization structures. For example one catalog could divide sub-catalogs by date and another 
-by providers, and users could browse down to both. The leaf Items should just be linked to in a single canonical location 
-(or at least use a rel link that indicates the location of the canonical one). It is recommended that dynamic catalogs 
-provide multiple 'views' to allow users to navigate in a way that makes sense to them, providing multiple 'sub-catalogs'
-from the root that enable different paths to browse (country/state, date/time, constellation/satellite, etc). But the 
-canonical 'rel' link should be used to designate the primary location of the Item to search engine crawlers.
-
-#### Example Layouts
-
 STAC makes no formal distinction between a "root" Catalog and the "child" Catalogs. A root Catalog
 is simply the top-most Catalog or Collection -- it has no parent. A nested catalog structure is useful (and
 recommended) for breaking up massive numbers of catalog Items into logical groupings. For example,
 it might make sense to organize a catalog by date (year, month, day), or geography (continent,
 country, state/prov).
 
-A simple STAC structure might look like this:
+A simple Static Catalog STAC structure might look like this:
 
 - catalog (root)
   - catalog
@@ -566,6 +550,22 @@ catalogs and items:
 
 The relationships are all described by a common `links` object structure, making use of
 the `rel` field to further describe the relationship. 
+ 
+
+#### Dynamic Catalog Layout
+
+While these recommendations were primarily written for [static catalogs](#static-catalogs), they apply
+equally well to [dynamic catalogs](#dynamic-catalogs). Subdirectories of course would just be URL paths 
+generated dynamically, but the structure would be the same as is recommended.
+
+One benefit of a dynamic catalog is that it can generate various 'views' of the catalog, exposing the same Items in 
+different sub-catalog organization structures. For example one catalog could divide sub-catalogs by date and another 
+by providers, and users could browse down to both. The leaf Items should just be linked to in a single canonical location 
+(or at least use a rel link that indicates the location of the canonical one). It is recommended that dynamic catalogs 
+provide multiple 'views' to allow users to navigate in a way that makes sense to them, providing multiple 'sub-catalogs'
+from the root that enable different paths to browse (country/state, date/time, constellation/satellite, etc). But the 
+canonical 'rel' link should be used to designate the primary location of the Item to search engine crawlers.
+
 
 #### Mixing STAC Versions
 
